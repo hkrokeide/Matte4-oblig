@@ -1,1 +1,75 @@
+# Author: Helene Krokeide, Ingrid Westvik Kristoffersen, Sigrun Raastad and Pie Asla-Jakobsen
+# Date: April 11th 2024
 
+import numpy as np 
+import matplotlib.pyplot as plt 
+import matplotlib. animation as animation 
+from matplotlib.animation import FuncAnimation
+from matplotlib import _cm
+
+# total length
+
+length_x = 1
+length_y = 1 
+T = 0.05
+
+# number of steps 
+
+nx = 50
+ny = 50
+nt = 1000
+
+# lengdeper steg
+dx = length_x / nx
+dy = length_y / ny
+dt = T /nt
+
+# Heat equation 
+alpha = 2 
+dT = (length_x ** 2) / (alpha*4)
+gamma = (alpha * dT) / (length_x**2)
+
+# 
+
+v = np.zeros((nt, nx, ny))
+
+# Initial condition inside the grid
+
+v[0, :, :]= 0.0
+
+v_right = 0.0
+v_left = 0.0
+v_bottom = 0.0
+v_top = 100.0
+
+# Set the boundary conditions
+
+v[:, :, -1] = v_top
+v[:, 0, :] = v_left
+v[:, :, 0] = v_bottom
+v[:, -1, :] = v_right
+
+# Solves heat equation using Euler explisit
+
+for k in range(1, nt):
+    for i in range(1, nx -1):
+        for j in range(1, ny -1):
+            v[k, i, j] = v[k-1, i, j]+ gamma * (v[k-1,i+1,j] + v[k-1, i-1, j] + v[k-1, i, j+1] + v[k-1, i, j-1] - 4 * v[k-1, i, j])
+
+# Graphing 
+            
+fig, ax = plt.subplots()
+im = ax.imshow(v[0], cmap = 'hot', origin = 'lower', extent = [0, length_x, 0, length_y], interpolation = 'bicubic')
+plt.colorbar(im, ax=ax, label = 'Temperature')
+ax.set_xlabel('x')
+ax.set_ylabel('y')
+ax.set_aspect('equal')
+ax.set_title('Temperature distribtion at t = 0 ')
+
+def update(frame):
+    im.set_array(v[frame])
+    ax.set_title('Temperature distribution at t = {:.4f}'.format(frame * dt))
+    return im,
+
+ani = FuncAnimation(fig, update, frames = range(nt), interval = 50, blit = True)
+plt.show()
