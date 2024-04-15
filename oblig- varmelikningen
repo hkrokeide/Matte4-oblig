@@ -19,7 +19,7 @@ nx = 50
 ny = 50
 nt = 1000
 
-# lengdeper steg
+# length per step
 dx = length_x / nx
 dy = length_y / ny
 dt = T /nt
